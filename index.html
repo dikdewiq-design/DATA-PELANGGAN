@@ -3,317 +3,157 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SH Vision - Input Data Pelanggan</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <title>SH Vision - Aplikasi Pelanggan</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f9;
-      margin: 0;
-      padding: 0;
-      transition: background 0.3s, color 0.3s;
-    }
-    body.dark {
-      background: #1e1e1e;
-      color: #eaeaea;
-    }
-    header {
-      background: #00875a;
-      color: #fff;
-      padding: 15px;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-    header img {
-      height: 40px;
-    }
-    main {
-      max-width: 1000px;
-      margin: 20px auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      transition: background 0.3s, color 0.3s;
-    }
-    body.dark main {
-      background: #2c2c2c;
-      color: #eaeaea;
-    }
-    form input, form select, form button {
-      display: block;
-      width: 100%;
-      margin: 10px 0;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 14px;
-    }
-    form button {
-      background: #00875a;
-      color: #fff;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    form button:hover {
-      background: #006f48;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    table, th, td {
-      border: 1px solid #ccc;
-    }
-    th, td {
-      padding: 10px;
-      text-align: left;
-    }
-    th {
-      background: #f0f0f0;
-    }
-    body.dark th {
-      background: #3a3a3a;
-    }
-    .actions button {
-      margin-right: 5px;
-      padding: 5px 10px;
-      font-size: 12px;
-    }
-    #controls {
-      margin-top: 15px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    #searchInput {
-      flex: 1;
-      padding: 8px;
-    }
-    #toast {
-      visibility: hidden;
-      min-width: 250px;
-      margin-left: -125px;
-      background-color: #333;
-      color: #fff;
-      text-align: center;
-      border-radius: 5px;
-      padding: 10px;
-      position: fixed;
-      z-index: 1;
-      left: 50%;
-      bottom: 30px;
-      font-size: 14px;
-    }
-    #toast.show {
-      visibility: visible;
-      -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-      animation: fadein 0.5s, fadeout 0.5s 2.5s;
-    }
-    @-webkit-keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
-    @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
-    @-webkit-keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
-    @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+    body { font-family: Arial, sans-serif; background: #f4f4f9; margin: 0; padding: 0; }
+    header { background: #00875a; color: #fff; padding: 15px; text-align: center; }
+    main { max-width: 900px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    form input, form select, form button { display: block; width: 100%; margin: 10px 0; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+    form button { background: #00875a; color: #fff; cursor: pointer; font-weight: bold; }
+    form button:hover { background: #006f48; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    table, th, td { border: 1px solid #ccc; }
+    th, td { padding: 10px; text-align: left; }
+    th { background: #f0f0f0; }
+    #loginPage { display: flex; height: 100vh; justify-content: center; align-items: center; }
+    #loginBox { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); width: 300px; }
+    #appPage { display: none; }
+    .toast { visibility: hidden; min-width: 250px; margin-left: -125px; background: #333; color: #fff; text-align: center; border-radius: 4px; padding: 12px; position: fixed; z-index: 1; left: 50%; bottom: 30px; font-size: 14px; }
+    .toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+    @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
+    @keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
   </style>
 </head>
 <body>
-  <header>
-    <img src="https://via.placeholder.com/100x40?text=SH+Vision" alt="Logo SH Vision">
-    <h1>SH Vision - Input Data Pelanggan</h1>
-  </header>
 
-  <main>
-    <button id="darkModeToggle">🌙 Dark Mode</button>
-
-    <form id="pelangganForm">
-      <input type="text" id="nama" placeholder="Nama Lengkap" required>
-      <input type="text" id="alamat" placeholder="Alamat" required>
-      <input type="text" id="telepon" placeholder="Nomor HP" required>
-      <input type="email" id="email" placeholder="Email">
-      <input type="url" id="foto" placeholder="Link Foto Rumah">
-      <input type="url" id="maps" placeholder="Link Google Maps">
-      <select id="paket" required>
-        <option value="">-- Pilih Paket Internet --</option>
-        <option value="Basic 20Mbps">Basic 20Mbps</option>
-        <option value="Standard 50Mbps">Standard 50Mbps</option>
-        <option value="Premium 100Mbps">Premium 100Mbps</option>
-      </select>
-      <button type="submit">Tambah Data</button>
-    </form>
-
-    <div id="controls">
-      <input type="text" id="searchInput" placeholder="Cari pelanggan...">
-      <button onclick="downloadCSV()">Unduh CSV</button>
-      <button onclick="downloadExcel()">Unduh Excel</button>
-      <input type="file" id="importExcel" accept=".xlsx">
+  <!-- Login Page -->
+  <div id="loginPage">
+    <div id="loginBox">
+      <h2>Login SH Vision</h2>
+      <input type="text" id="loginUser" placeholder="Username">
+      <input type="password" id="loginPass" placeholder="Password">
+      <button onclick="login()">Login</button>
+      <p id="loginError" style="color:red; display:none;">Username / Password salah!</p>
     </div>
+  </div>
 
-    <table id="tabelPelanggan">
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>Nama</th>
-          <th>Alamat</th>
-          <th>Nomor HP</th>
-          <th>Email</th>
-          <th>Foto Rumah</th>
-          <th>Maps</th>
-          <th>Paket</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </main>
+  <!-- App Page -->
+  <div id="appPage">
+    <header>
+      <h1>SH Vision - Data Pelanggan</h1>
+    </header>
 
-  <div id="toast"></div>
+    <main>
+      <form id="pelangganForm">
+        <input type="text" id="nama" placeholder="Nama Lengkap" required>
+        <input type="text" id="alamat" placeholder="Alamat" required>
+        <input type="text" id="telepon" placeholder="Nomor HP" required>
+        <input type="email" id="email" placeholder="Email">
+        <select id="paket" required>
+          <option value="">-- Pilih Paket Internet --</option>
+          <option value="Basic 20Mbps">Basic 20Mbps</option>
+          <option value="Standard 50Mbps">Standard 50Mbps</option>
+          <option value="Premium 100Mbps">Premium 100Mbps</option>
+        </select>
+        <input type="url" id="foto" placeholder="Link Foto Rumah">
+        <input type="url" id="map" placeholder="Link Google Maps">
+        <button type="submit">Tambah Data</button>
+      </form>
 
-  <script>
-    const form = document.getElementById('pelangganForm');
-    const tabelBody = document.querySelector('#tabelPelanggan tbody');
-    const searchInput = document.getElementById('searchInput');
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    const toast = document.getElementById('toast');
-    let dataPelanggan = JSON.parse(localStorage.getItem('pelanggan')) || [];
+      <table id="tabelPelanggan">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nama</th>
+            <th>Alamat</th>
+            <th>Nomor HP</th>
+            <th>Email</th>
+            <th>Paket</th>
+            <th>Foto Rumah</th>
+            <th>Maps</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </main>
+  </div>
 
-    function showToast(message) {
-      toast.innerText = message;
-      toast.className = 'show';
-      setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 3000);
+  <div id="toast" class="toast"></div>
+
+<script>
+  const SCRIPT_URL = "https://docs.google.com/spreadsheets/d/1QnmxQGgdfzTFTTyLYEsVhs7JcLM0Plrp8yw5ijuXgqM/edit?usp=sharing"; // ganti dengan URL Web App Google Script
+  let counter = 1;
+
+  // Login
+  function login() {
+    const user = document.getElementById("loginUser").value;
+    const pass = document.getElementById("loginPass").value;
+    if (user === "kenzonet" && pass === "23456") {
+      localStorage.setItem("isLogin", "true");
+      document.getElementById("loginPage").style.display = "none";
+      document.getElementById("appPage").style.display = "block";
+    } else {
+      document.getElementById("loginError").style.display = "block";
     }
+  }
 
-    function renderTable() {
-      tabelBody.innerHTML = '';
-      dataPelanggan.forEach((p, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${index + 1}</td>
-          <td>${p.nama}</td>
-          <td>${p.alamat}</td>
-          <td>${p.telepon}</td>
-          <td>${p.email}</td>
-          <td><a href="${p.foto}" target="_blank">Link Foto</a></td>
-          <td><a href="${p.maps}" target="_blank">Maps</a></td>
-          <td>${p.paket}</td>
-          <td class="actions">
-            <button onclick="editData(${index})">Edit</button>
-            <button onclick="hapusData(${index})">Hapus</button>
-          </td>
-        `;
-        tabelBody.appendChild(row);
-      });
-      localStorage.setItem('pelanggan', JSON.stringify(dataPelanggan));
+  // Cek status login
+  window.onload = function() {
+    if (localStorage.getItem("isLogin") === "true") {
+      document.getElementById("loginPage").style.display = "none";
+      document.getElementById("appPage").style.display = "block";
     }
+  };
 
-    function validasiInput(nama, alamat, telepon, email) {
-      const hpRegex = /^\d{10,15}$/;
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!hpRegex.test(telepon)) {
-        alert('Nomor HP harus angka 10-15 digit!');
-        return false;
-      }
-      if (email && !emailRegex.test(email)) {
-        alert('Format email tidak valid!');
-        return false;
-      }
-      return true;
-    }
+  // Form submit
+  const form = document.getElementById("pelangganForm");
+  const tabelBody = document.querySelector("#tabelPelanggan tbody");
 
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    const data = {
+      nama: document.getElementById("nama").value,
+      alamat: document.getElementById("alamat").value,
+      telepon: document.getElementById("telepon").value,
+      email: document.getElementById("email").value,
+      paket: document.getElementById("paket").value,
+      foto: document.getElementById("foto").value,
+      map: document.getElementById("map").value
+    };
 
-      const nama = document.getElementById('nama').value;
-      const alamat = document.getElementById('alamat').value;
-      const telepon = document.getElementById('telepon').value;
-      const email = document.getElementById('email').value;
-      const foto = document.getElementById('foto').value;
-      const maps = document.getElementById('maps').value;
-      const paket = document.getElementById('paket').value;
+    // Tambah ke tabel
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${counter++}</td>
+      <td>${data.nama}</td>
+      <td>${data.alamat}</td>
+      <td>${data.telepon}</td>
+      <td>${data.email}</td>
+      <td>${data.paket}</td>
+      <td><a href="${data.foto}" target="_blank">Lihat Foto</a></td>
+      <td><a href="${data.map}" target="_blank">Lihat Map</a></td>
+    `;
+    tabelBody.appendChild(row);
 
-      if (!validasiInput(nama, alamat, telepon, email)) return;
+    // Kirim ke Google Sheets
+    fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify(data)
+    })
+    .then(res => res.text())
+    .then(response => showToast("Data berhasil dikirim ke Google Sheets"))
+    .catch(err => showToast("Gagal kirim ke Google Sheets"));
 
-      dataPelanggan.push({ nama, alamat, telepon, email, foto, maps, paket });
-      renderTable();
-      showToast('Data berhasil ditambahkan!');
-      form.reset();
-    });
+    form.reset();
+  });
 
-    function hapusData(index) {
-      if (confirm('Yakin ingin menghapus data ini?')) {
-        dataPelanggan.splice(index, 1);
-        renderTable();
-        showToast('Data berhasil dihapus!');
-      }
-    }
-
-    function editData(index) {
-      const p = dataPelanggan[index];
-      document.getElementById('nama').value = p.nama;
-      document.getElementById('alamat').value = p.alamat;
-      document.getElementById('telepon').value = p.telepon;
-      document.getElementById('email').value = p.email;
-      document.getElementById('foto').value = p.foto;
-      document.getElementById('maps').value = p.maps;
-      document.getElementById('paket').value = p.paket;
-
-      dataPelanggan.splice(index, 1);
-      renderTable();
-      showToast('Silakan edit data dan simpan kembali.');
-    }
-
-    searchInput.addEventListener('keyup', function() {
-      const filter = searchInput.value.toLowerCase();
-      const rows = tabelBody.getElementsByTagName('tr');
-      Array.from(rows).forEach(row => {
-        const text = row.innerText.toLowerCase();
-        row.style.display = text.includes(filter) ? '' : 'none';
-      });
-    });
-
-    function downloadCSV() {
-      let csv = 'No,Nama,Alamat,Nomor HP,Email,Foto,Maps,Paket\n';
-      dataPelanggan.forEach((p, i) => {
-        csv += `${i+1},${p.nama},${p.alamat},${p.telepon},${p.email},${p.foto},${p.maps},${p.paket}\n`;
-      });
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'data_pelanggan.csv';
-      a.click();
-    }
-
-    function downloadExcel() {
-      const ws = XLSX.utils.json_to_sheet(dataPelanggan);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Pelanggan");
-      XLSX.writeFile(wb, "data_pelanggan.xlsx");
-    }
-
-    document.getElementById('importExcel').addEventListener('change', function(e) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        const json = XLSX.utils.sheet_to_json(worksheet);
-        dataPelanggan = dataPelanggan.concat(json);
-        renderTable();
-        showToast('Data berhasil diimport dari Excel!');
-      };
-      reader.readAsArrayBuffer(e.target.files[0]);
-    });
-
-    darkModeToggle.addEventListener('click', () => {
-      document.body.classList.toggle('dark');
-    });
-
-    renderTable();
-  </script>
+  // Toast notification
+  function showToast(msg) {
+    const x = document.getElementById("toast");
+    x.innerHTML = msg;
+    x.className = "toast show";
+    setTimeout(() => { x.className = x.className.replace("show", ""); }, 3000);
+  }
+</script>
 </body>
 </html>

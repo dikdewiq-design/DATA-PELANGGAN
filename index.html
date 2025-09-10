@@ -1,227 +1,527 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SH Vision - Data Pelanggan</title>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SH Vision - Dashboard Pelanggan</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- DataTables CSS -->
+  <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet"/>
+
+  <!-- Toastify for nice toasts -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
   <style>
-    body { margin:0; font-family:"Segoe UI", sans-serif; background:#f9fafb; color:#333; }
-    header { background:#006f48; color:#fff; padding:15px; text-align:center; }
-    header img { height:50px; }
-    main { max-width:1100px; margin:20px auto; background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
-    h2 { margin-top:0; }
-    form { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
-    form input, form select, form button { padding:10px; border-radius:8px; border:1px solid #ccc; font-size:14px; }
-    form button { grid-column:span 2; background:#006f48; color:#fff; border:none; font-weight:bold; cursor:pointer; }
-    form button:hover { background:#004f34; }
-    .tools { margin:15px 0; display:flex; gap:10px; flex-wrap:wrap; }
-    .tools button, .tools input[type=file] { padding:8px 12px; border:none; border-radius:6px; cursor:pointer; background:#e5e7eb; }
-    .tools button:hover { background:#d1d5db; }
-    #search { flex:1; padding:8px 12px; border-radius:6px; border:1px solid #ccc; }
-    table { width:100%; border-collapse:collapse; margin-top:15px; border-radius:10px; overflow:hidden; }
-    th, td { padding:10px; border-bottom:1px solid #ddd; text-align:left; }
-    th { background:#f3f4f6; }
-    tr:hover { background:#f9fafc; }
-    .actions button { margin:2px; padding:5px 10px; font-size:12px; border:none; border-radius:4px; cursor:pointer; }
-    .editBtn { background:#2563eb; color:#fff; }
-    .deleteBtn { background:#dc2626; color:#fff; }
-    .dark { background:#111827; color:#eee; }
-    .dark main { background:#1f2937; }
-    .dark table th { background:#374151; color:#eee; }
-    .dark table td { color:#eee; }
-    #loginPage { display:flex; height:100vh; justify-content:center; align-items:center; background:#f3f4f6; }
-    #loginBox { background:white; padding:30px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.2); width:300px; text-align:center; }
-    #toast { visibility:hidden; min-width:250px; margin-left:-125px; background:#333; color:#fff; text-align:center; border-radius:6px; padding:12px; position:fixed; z-index:1; left:50%; bottom:30px; font-size:14px; }
-    #toast.show { visibility:visible; animation:fadein 0.5s, fadeout 0.5s 2.5s; }
-    @keyframes fadein { from{bottom:0;opacity:0;} to{bottom:30px;opacity:1;} }
-    @keyframes fadeout { from{bottom:30px;opacity:1;} to{bottom:0;opacity:0;} }
+    body { background:#f3f4f6; }
+    header { background:#0f766e; color:white; padding:18px; }
+    header .logo { height:48px; margin-right:12px; }
+    .card { border-radius:12px; box-shadow:0 6px 18px rgba(15,23,42,0.08); }
+    table.dataTable tbody tr:hover { background:#f1f5f9; }
+    .dt-button { border-radius:6px !important; }
+    .dark-mode { background:#0b1220; color:#e6eef8; }
+    .dark-mode .card { background:#0f1724; color:#e6eef8; }
+    .dark-mode table.dataTable thead th { background:#0b1220; color:#e6eef8; }
+    @media (max-width:768px){
+      .form-row-2 { display:flex; gap:12px; flex-direction:column; }
+    }
   </style>
 </head>
 <body>
 
-<!-- Login Page -->
-<div id="loginPage">
-  <div id="loginBox">
-    <img src="https://via.placeholder.com/200x60?text=SH+Vision" alt="Logo SH Vision">
-    <h2>Login</h2>
-    <input type="text" id="loginUser" placeholder="Username">
-    <input type="password" id="loginPass" placeholder="Password">
-    <button onclick="login()">Masuk</button>
-    <p id="loginError" style="color:red; display:none;">Login gagal!</p>
-  </div>
-</div>
-
-<!-- App Page -->
-<div id="appPage" style="display:none;">
-  <header>
-    <img src="https://via.placeholder.com/200x60?text=SH+Vision" alt="Logo SH Vision">
-    <h1>Manajemen Data Pelanggan</h1>
-    <button onclick="toggleDarkMode()">🌙/☀️</button>
-  </header>
-
-  <main>
-    <h2>Tambah Pelanggan Baru</h2>
-    <form id="pelangganForm">
-      <input type="text" id="nama" placeholder="Nama Lengkap" required>
-      <input type="text" id="alamat" placeholder="Alamat" required>
-      <input type="text" id="telepon" placeholder="Nomor HP" required>
-      <input type="email" id="email" placeholder="Email">
-      <select id="paket" required>
-        <option value="">-- Pilih Paket --</option>
-        <option>Basic 20Mbps</option>
-        <option>Standard 50Mbps</option>
-        <option>Premium 100Mbps</option>
-      </select>
-      <input type="url" id="foto" placeholder="Link Foto Rumah">
-      <input type="url" id="map" placeholder="Link Google Maps">
-      <button type="submit">Simpan Data</button>
-    </form>
-
-    <div class="tools">
-      <input type="text" id="search" placeholder="Cari pelanggan...">
-      <button onclick="exportCSV()">Export CSV</button>
-      <button onclick="exportExcel()">Export Excel</button>
-      <input type="file" id="importExcel" accept=".xlsx">
+<!-- Header / Login -->
+<header class="d-flex align-items-center">
+  <div class="container d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+      <img class="logo" src="https://via.placeholder.com/160x48?text=SH+Vision" alt="Logo SH Vision"/>
+      <div>
+        <h4 class="mb-0">SH Vision</h4>
+        <small>Manajemen Data Pelanggan</small>
+      </div>
     </div>
 
-    <table id="tabelPelanggan">
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>Nama</th>
-          <th>Alamat</th>
-          <th>Nomor HP</th>
-          <th>Email</th>
-          <th>Paket</th>
-          <th>Foto</th>
-          <th>Maps</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </main>
-</div>
+    <div id="headerRight" class="d-flex align-items-center gap-2">
+      <button id="toggleDark" class="btn btn-outline-light btn-sm">🌙</button>
+      <button id="logoutBtn" class="btn btn-danger btn-sm d-none">Logout</button>
+    </div>
+  </div>
+</header>
 
-<div id="toast"></div>
+<!-- Main Content -->
+<main class="container my-4">
+  <!-- Login Card -->
+  <div id="loginCard" class="card p-4 mx-auto" style="max-width:440px;">
+    <h5 class="mb-3">Login ke SH Vision</h5>
+    <form id="loginForm">
+      <div class="mb-2">
+        <input id="loginUser" class="form-control" placeholder="Username" required>
+      </div>
+      <div class="mb-3">
+        <input id="loginPass" type="password" class="form-control" placeholder="Password" required>
+      </div>
+      <div class="d-grid gap-2">
+        <button class="btn btn-success" type="submit">Login</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Dashboard (hidden until login) -->
+  <div id="dashboard" class="d-none">
+    <div class="row g-3">
+      <div class="col-lg-5">
+        <div class="card p-3">
+          <h5>Tambah / Edit Pelanggan</h5>
+          <form id="formPelanggan">
+            <input type="hidden" id="recordId" />
+            <div class="mb-2">
+              <input id="nama" class="form-control" placeholder="Nama Lengkap" required>
+            </div>
+            <div class="mb-2">
+              <input id="alamat" class="form-control" placeholder="Alamat" required>
+            </div>
+            <div class="row g-2">
+              <div class="col-6">
+                <input id="hp" class="form-control" placeholder="Nomor HP" required>
+              </div>
+              <div class="col-6">
+                <input id="email" type="email" class="form-control" placeholder="Email">
+              </div>
+            </div>
+
+            <div class="row g-2 mt-2">
+              <div class="col-6">
+                <select id="paket" class="form-select" required>
+                  <option value="">-- Pilih Paket --</option>
+                  <option>Basic 20Mbps</option>
+                  <option>Standard 50Mbps</option>
+                  <option>Premium 100Mbps</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <!-- camera capture -->
+                <input id="fotoFile" type="file" accept="image/*" capture="environment" class="form-control">
+              </div>
+            </div>
+
+            <div class="mb-2 mt-2">
+              <input id="map" class="form-control" placeholder="Link Google Maps (klik 'Lihat' nanti untuk buka)">
+            </div>
+
+            <div class="d-flex gap-2">
+              <button id="saveBtn" class="btn btn-primary flex-grow-1" type="submit">Simpan</button>
+              <button id="resetBtn" class="btn btn-secondary" type="button">Reset</button>
+            </div>
+
+            <small class="text-muted d-block mt-2">Klik tombol Foto akan membuka kamera di perangkat mobile (jika didukung).</small>
+          </form>
+
+          <hr/>
+
+          <div class="d-flex gap-2 mb-2">
+            <input id="searchBox" class="form-control" placeholder="Cari pelanggan...">
+            <button id="exportCsv" class="btn btn-outline-secondary">Export CSV</button>
+            <button id="exportXlsx" class="btn btn-outline-secondary">Export Excel</button>
+          </div>
+
+          <div class="d-flex gap-2">
+            <input id="importFile" type="file" accept=".xlsx,.xls" class="form-control">
+            <button id="importBtn" class="btn btn-outline-secondary">Import</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-7">
+        <div class="card p-3">
+          <h5>Daftar Pelanggan</h5>
+          <div class="table-responsive">
+            <table id="tablePelanggan" class="table table-sm table-hover" style="width:100%;">
+              <thead class="table-light">
+                <tr>
+                  <th>No</th>
+                  <th>Nama</th>
+                  <th>Alamat</th>
+                  <th>HP</th>
+                  <th>Email</th>
+                  <th>Paket</th>
+                  <th>Foto</th>
+                  <th>Maps</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Toastify -->
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<!-- jQuery (DataTables) -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- DataTables -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<!-- SheetJS -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjmRcaiz6AvwnCxewfqU9mXNpjlg7E8XZsxd67cBQ8Mr37paJZznmdRCdiLufwKh4vdQ/exec"; // ganti dengan URL Apps Script
-let editingRow = null;
-let counter = 1;
+/* ================== CONFIG ================== */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzwrzA4T3Vo-hXavE1g4R7kn52tDZQlqOkLR6q2SOLYFmuHjt3uZBzJxcMYZBpCmGFF7A/exec"; // <- ganti dengan URL Apps Script deploy
+const LOGIN_USER = "kenzonet";
+const LOGIN_PASS = "23456";
 
-// Login
-function login(){
-  const u=document.getElementById("loginUser").value;
-  const p=document.getElementById("loginPass").value;
-  if(u==="kenzonet" && p==="23456"){
-    localStorage.setItem("isLogin","true");
-    document.getElementById("loginPage").style.display="none";
-    document.getElementById("appPage").style.display="block";
-    loadData();
-  } else document.getElementById("loginError").style.display="block";
+/* ================== UI helpers ================== */
+function toast(msg, type='info') {
+  Toastify({
+    text: msg,
+    duration: 3000,
+    gravity: "bottom",
+    position: "center",
+    backgroundColor: (type==='success')? "#198754" : (type==='error')? "#dc3545" : "#333"
+  }).showToast();
 }
-window.onload=()=>{ if(localStorage.getItem("isLogin")==="true"){ document.getElementById("loginPage").style.display="none"; document.getElementById("appPage").style.display="block"; loadData(); } };
 
-// Toast
-function showToast(msg){ const t=document.getElementById("toast"); t.innerText=msg; t.className="show"; setTimeout(()=>{t.className=t.className.replace("show","");},3000); }
+/* ================== Login handling ================== */
+const loginCard = document.getElementById('loginCard');
+const dashboard = document.getElementById('dashboard');
+const logoutBtn = document.getElementById('logoutBtn');
 
-// Tambah data
-document.getElementById("pelangganForm").addEventListener("submit",function(e){
+document.getElementById('loginForm').addEventListener('submit', (e) => {
   e.preventDefault();
-  const data={
-    nama:nama.value, alamat:alamat.value, telepon:telepon.value, email:email.value,
-    paket:paket.value, foto:foto.value, map:map.value
-  };
-  if(editingRow){ updateRow(editingRow,data); editingRow=null; showToast("Data diupdate"); }
-  else {
-    tambahRow(data);
-    fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify(data)});
-    showToast("Data tersimpan ke Google Sheets");
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  if (u === LOGIN_USER && p === LOGIN_PASS) {
+    localStorage.setItem('shvision_logged','1');
+    showDashboard();
+    toast('Login sukses', 'success');
+  } else {
+    toast('Username / password salah', 'error');
   }
-  this.reset();
 });
 
-// Tabel
-function tambahRow(d){
-  const tbody=document.querySelector("#tabelPelanggan tbody");
-  const row=document.createElement("tr");
-  row.innerHTML=`<td>${counter++}</td>
-    <td>${d.nama}</td><td>${d.alamat}</td><td>${d.telepon}</td>
-    <td>${d.email}</td><td>${d.paket}</td>
-    <td><a href="${d.foto}" target="_blank">Foto</a></td>
-    <td><a href="${d.map}" target="_blank">Map</a></td>
-    <td class="actions">
-      <button class="editBtn" onclick="editRow(this)">Edit</button>
-      <button class="deleteBtn" onclick="deleteRow(this)">Hapus</button>
-    </td>`;
-  tbody.appendChild(row);
+function showDashboard(){
+  loginCard.classList.add('d-none');
+  dashboard.classList.remove('d-none');
+  logoutBtn.classList.remove('d-none');
+  loadAll();
 }
-function updateRow(row,d){
-  row.cells[1].innerText=d.nama; row.cells[2].innerText=d.alamat; row.cells[3].innerText=d.telepon;
-  row.cells[4].innerText=d.email; row.cells[5].innerText=d.paket;
-  row.cells[6].innerHTML=`<a href="${d.foto}" target="_blank">Foto</a>`;
-  row.cells[7].innerHTML=`<a href="${d.map}" target="_blank">Map</a>`;
+function showLogin(){
+  loginCard.classList.remove('d-none');
+  dashboard.classList.add('d-none');
+  logoutBtn.classList.add('d-none');
 }
-function editRow(btn){ editingRow=btn.closest("tr");
-  nama.value=editingRow.cells[1].innerText; alamat.value=editingRow.cells[2].innerText;
-  telepon.value=editingRow.cells[3].innerText; email.value=editingRow.cells[4].innerText;
-  paket.value=editingRow.cells[5].innerText;
-}
-function deleteRow(btn){ btn.closest("tr").remove(); showToast("Data dihapus"); }
-
-// Load dari Sheets
-function loadData(){
-  fetch(SCRIPT_URL).then(r=>r.json()).then(rows=>{
-    document.querySelector("#tabelPelanggan tbody").innerHTML=""; counter=1;
-    rows.forEach(d=>tambahRow(d));
-  });
-}
-
-// Search
-document.getElementById("search").addEventListener("input",function(){
-  const q=this.value.toLowerCase();
-  document.querySelectorAll("#tabelPelanggan tbody tr").forEach(r=>{
-    r.style.display=[...r.children].some(td=>td.innerText.toLowerCase().includes(q))?"":"none";
-  });
+logoutBtn.addEventListener('click', () => {
+  localStorage.removeItem('shvision_logged');
+  showLogin();
 });
 
-// Export CSV
-function exportCSV(){
-  let csv="No,Nama,Alamat,Telepon,Email,Paket,Foto,Map\n";
-  document.querySelectorAll("#tabelPelanggan tbody tr").forEach(r=>{
-    let cols=[...r.children].slice(1,8).map(td=>td.innerText); csv+=cols.join(",")+"\n";
-  });
-  const blob=new Blob([csv],{type:"text/csv"}); const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob); a.download="pelanggan.csv"; a.click();
+/* On load check login */
+if (localStorage.getItem('shvision_logged') === '1') {
+  showDashboard();
+} else {
+  showLogin();
 }
 
-// Export Excel
-function exportExcel(){
-  const wb=XLSX.utils.book_new();
-  const ws_data=[["No","Nama","Alamat","Telepon","Email","Paket","Foto","Map"]];
-  document.querySelectorAll("#tabelPelanggan tbody tr").forEach(r=>{
-    ws_data.push([...[...r.children].slice(0,8)].map(td=>td.innerText));
+/* ================== DataTable init ================== */
+let table;
+function initDataTable() {
+  if ($.fn.dataTable.isDataTable('#tablePelanggan')) {
+    table = $('#tablePelanggan').DataTable();
+    table.clear().draw();
+    return;
+  }
+  table = $('#tablePelanggan').DataTable({
+    columns: [
+      { data: 'no', width: '5%' },
+      { data: 'nama' },
+      { data: 'alamat' },
+      { data: 'hp' },
+      { data: 'email' },
+      { data: 'paket' },
+      { data: 'foto', orderable: false, searchable: false, width: '8%' },
+      { data: 'map', orderable: false, searchable: false, width: '8%' },
+      { data: 'aksi', orderable: false, searchable: false, width: '12%' }
+    ],
+    pageLength: 8,
+    lengthChange: false,
+    responsive: true,
+    language: { emptyTable: "Belum ada data pelanggan" }
   });
-  const ws=XLSX.utils.aoa_to_sheet(ws_data); XLSX.utils.book_append_sheet(wb,ws,"Pelanggan");
-  XLSX.writeFile(wb,"pelanggan.xlsx");
 }
 
-// Import Excel
-document.getElementById("importExcel").addEventListener("change",function(e){
-  const file=e.target.files[0]; const reader=new FileReader();
-  reader.onload=(evt)=>{
-    const wb=XLSX.read(new Uint8Array(evt.target.result),{type:"array"});
-    const sheet=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-    sheet.forEach(row=>{ tambahRow(row); fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify(row)}); });
-    showToast("Import selesai");
+/* ================== CRUD + Sync ================== */
+
+async function fetchAllFromSheet(){
+  try {
+    const res = await fetch(SCRIPT_URL);
+    if (!res.ok) throw new Error('Fetch failed');
+    const data = await res.json();
+    return data; // array of objects with id,nama,alamat,hp,email,paket,foto,map
+  } catch (err) {
+    toast('Gagal menghubungi Google Sheets', 'error');
+    return [];
+  }
+}
+
+async function addToSheet(record){
+  try {
+    const body = Object.assign({action:'add'}, record);
+    const res = await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify(body) });
+    const j = await res.json();
+    if (j.status === 'ok') return j.id || null;
+    return null;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
+async function updateToSheet(id, record){
+  try {
+    const body = Object.assign({action:'update', id: id}, record);
+    const res = await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify(body) });
+    const j = await res.json();
+    return j.status === 'ok';
+  } catch (err) {
+    console.error(err);
+    return false;
+  }
+}
+
+async function deleteFromSheet(id){
+  try {
+    const body = { action: 'delete', id: id };
+    const res = await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify(body) });
+    const j = await res.json();
+    return j.status === 'ok';
+  } catch (err) {
+    console.error(err);
+    return false;
+  }
+}
+
+/* ================== Render table ================== */
+function renderTable(rows){
+  initDataTable();
+  table.clear();
+  rows.forEach((r, idx) => {
+    const fotoHtml = r.foto ? `<a href="${r.foto}" target="_blank"><img src="${r.foto}" style="max-width:50px;border-radius:6px"></a>` : '-';
+    const mapHtml = r.map ? `<a class="btn btn-sm btn-primary" href="${r.map}" target="_blank">Lihat</a>` : '-';
+    const aksiHtml = `
+      <button class="btn btn-sm btn-info me-1" onclick="onEdit('${r.id}')">Edit</button>
+      <button class="btn btn-sm btn-danger" onclick="onDelete('${r.id}')">Hapus</button>
+    `;
+    table.row.add({
+      no: idx+1,
+      nama: r.nama || '',
+      alamat: r.alamat || '',
+      hp: r.hp || '',
+      email: r.email || '',
+      paket: r.paket || '',
+      foto: fotoHtml,
+      map: mapHtml,
+      aksi: aksiHtml,
+      _raw: r
+    });
+  });
+  table.draw(false);
+}
+
+/* ================== Load all data and render ================== */
+async function loadAll(){
+  initDataTable();
+  const rows = await fetchAllFromSheet();
+  renderTable(rows);
+}
+
+/* ================== Form handling ================== */
+document.getElementById('formPelanggan').addEventListener('submit', async function(e){
+  e.preventDefault();
+
+  const id = document.getElementById('recordId').value || null;
+  const nama = document.getElementById('nama').value.trim();
+  const alamat = document.getElementById('alamat').value.trim();
+  const hp = document.getElementById('hp').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const paket = document.getElementById('paket').value;
+  const map = document.getElementById('map').value.trim();
+
+  // validate hp (10-15 digits)
+  if (!/^\d{8,15}$/.test(hp)) { toast('Nomor HP harus angka 8-15 digit', 'error'); return; }
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast('Email tidak valid', 'error'); return; }
+
+  // read foto file as dataURL if present
+  const fotoFile = document.getElementById('fotoFile').files[0];
+  let fotoData = '';
+  if (fotoFile) {
+    fotoData = await fileToDataURL(fotoFile);
+  }
+
+  const record = { nama, alamat, hp, email, paket, foto: fotoData, map };
+
+  if (!id) {
+    // add
+    const newId = await addToSheet(record);
+    if (newId) {
+      toast('Data berhasil ditambah', 'success');
+      // refresh table
+      await loadAll();
+      this.reset();
+    } else {
+      toast('Gagal tambah data', 'error');
+    }
+  } else {
+    // update
+    const ok = await updateToSheet(id, record);
+    if (ok) {
+      toast('Data berhasil diupdate', 'success');
+      document.getElementById('recordId').value = '';
+      await loadAll();
+      this.reset();
+    } else {
+      toast('Gagal update data', 'error');
+    }
+  }
+});
+
+/* Reset form */
+document.getElementById('resetBtn').addEventListener('click', () => {
+  document.getElementById('formPelanggan').reset();
+  document.getElementById('recordId').value = '';
+});
+
+/* Edit handler: fill form with data from sheet (by id) */
+window.onEdit = async function(id) {
+  const rows = await fetchAllFromSheet();
+  const rec = rows.find(r => r.id === id);
+  if (!rec) { toast('Data tidak ditemukan', 'error'); return; }
+  document.getElementById('recordId').value = rec.id;
+  document.getElementById('nama').value = rec.nama || '';
+  document.getElementById('alamat').value = rec.alamat || '';
+  document.getElementById('hp').value = rec.hp || '';
+  document.getElementById('email').value = rec.email || '';
+  document.getElementById('paket').value = rec.paket || '';
+  document.getElementById('map').value = rec.map || '';
+  // note: foto cannot be set to file input (browser limitation). We keep it as-is.
+  toast('Edit mode: ubah form lalu klik Simpan', 'info');
+};
+
+/* Delete handler */
+window.onDelete = async function(id) {
+  if (!confirm('Yakin ingin menghapus data ini?')) return;
+  const ok = await deleteFromSheet(id);
+  if (ok) {
+    toast('Data berhasil dihapus', 'success');
+    await loadAll();
+  } else {
+    toast('Gagal hapus data', 'error');
+  }
+};
+
+/* ================== utility: file -> dataURL ================== */
+function fileToDataURL(file) {
+  return new Promise((resolve,reject)=>{
+    const fr = new FileReader();
+    fr.onload = ()=>resolve(fr.result);
+    fr.onerror = reject;
+    fr.readAsDataURL(file);
+  });
+}
+
+/* ================== Search box -> DataTable search ================== */
+document.getElementById('searchBox').addEventListener('input', function(){
+  const q = this.value;
+  if (table) table.search(q).draw();
+});
+
+/* ================== Export CSV / Excel using SheetJS ================== */
+document.getElementById('exportCsv').addEventListener('click', exportCSV);
+document.getElementById('exportXlsx').addEventListener('click', exportExcel);
+
+function tableToArray() {
+  const data = [];
+  table.rows().every(function(rowIdx){
+    const d = this.data();
+    data.push({
+      Nama: d.nama,
+      Alamat: d.alamat,
+      HP: d.hp,
+      Email: d.email,
+      Paket: d.paket,
+      Foto: d._raw ? d._raw.foto : '',
+      Map: d._raw ? d._raw.map : ''
+    });
+  });
+  return data;
+}
+
+function exportCSV() {
+  const arr = tableToArray();
+  let csv = 'Nama,Alamat,HP,Email,Paket,Foto,Map\n';
+  arr.forEach(r => {
+    csv += `"${r.Nama}","${r.Alamat}","${r.HP}","${r.Email}","${r.Paket}","${r.Foto}","${r.Map}"\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'pelanggan.csv';
+  a.click();
+}
+
+function exportExcel() {
+  const arr = tableToArray();
+  const ws = XLSX.utils.json_to_sheet(arr);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Pelanggan');
+  XLSX.writeFile(wb, 'pelanggan.xlsx');
+}
+
+/* ================== Import Excel -> push to sheet ================== */
+document.getElementById('importBtn').addEventListener('click', async () => {
+  const f = document.getElementById('importFile').files[0];
+  if (!f) { toast('Pilih file Excel dulu', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const data = new Uint8Array(e.target.result);
+    const wb = XLSX.read(data, { type: 'array' });
+    const sheetName = wb.SheetNames[0];
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName]);
+    // rows: array of objects, keys should match Nama,Alamat,HP,Email,Paket,Foto,Map
+    let count = 0;
+    for (const r of rows) {
+      const rec = {
+        nama: r.Nama || r.nama || '',
+        alamat: r.Alamat || r.alamat || '',
+        hp: String(r['Nomor HP'] || r.HP || r.hp || ''),
+        email: r.Email || r.email || '',
+        paket: r.Paket || r.paket || '',
+        foto: r.Foto || r.foto || '',
+        map: r.Map || r.map || ''
+      };
+      await addToSheet(rec);
+      count++;
+    }
+    toast(`Import selesai (${count} baris)`, 'success');
+    await loadAll();
   };
-  reader.readAsArrayBuffer(file);
+  reader.readAsArrayBuffer(f);
 });
 
-// Dark mode
-function toggleDarkMode(){ document.body.classList.toggle("dark"); }
+/* ================== Dark mode toggle ================== */
+document.getElementById('toggleDark').addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode');
+});
+
+/* Initialize DataTable at start */
+initDataTable();
+
 </script>
 </body>
 </html>

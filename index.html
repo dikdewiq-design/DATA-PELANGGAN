@@ -3,225 +3,225 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SH Vision - Aplikasi Pelanggan</title>
+  <title>SH Vision - Data Pelanggan</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f4f4f9; transition: background 0.3s, color 0.3s; }
-    header { background:#00875a; color:#fff; padding:15px; text-align:center; }
-    main { max-width:1000px; margin:20px auto; background:#fff; padding:20px; border-radius:10px; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
-    form input, form select, form button { display:block; width:100%; margin:10px 0; padding:10px; border:1px solid #ccc; border-radius:5px; font-size:14px; }
-    form button { background:#00875a; color:#fff; cursor:pointer; font-weight:bold; }
-    form button:hover { background:#006f48; }
-    table { width:100%; border-collapse:collapse; margin-top:20px; }
-    table, th, td { border:1px solid #ccc; }
-    th, td { padding:10px; text-align:left; }
-    th { background:#f0f0f0; cursor:pointer; }
-    #loginPage { display:flex; height:100vh; justify-content:center; align-items:center; }
-    #loginBox { background:white; padding:30px; border-radius:10px; box-shadow:0 4px 6px rgba(0,0,0,0.2); width:300px; }
-    #appPage { display:none; }
-    .toast { visibility:hidden; min-width:250px; margin-left:-125px; background:#333; color:#fff; text-align:center; border-radius:4px; padding:12px; position:fixed; z-index:1; left:50%; bottom:30px; font-size:14px; }
-    .toast.show { visibility:visible; animation:fadein 0.5s, fadeout 0.5s 2.5s; }
+    body { margin:0; font-family:"Segoe UI", sans-serif; background:#f9fafb; color:#333; }
+    header { background:#006f48; color:#fff; padding:15px; text-align:center; }
+    header img { height:50px; }
+    main { max-width:1100px; margin:20px auto; background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+    h2 { margin-top:0; }
+    form { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+    form input, form select, form button { padding:10px; border-radius:8px; border:1px solid #ccc; font-size:14px; }
+    form button { grid-column:span 2; background:#006f48; color:#fff; border:none; font-weight:bold; cursor:pointer; }
+    form button:hover { background:#004f34; }
+    .tools { margin:15px 0; display:flex; gap:10px; flex-wrap:wrap; }
+    .tools button, .tools input[type=file] { padding:8px 12px; border:none; border-radius:6px; cursor:pointer; background:#e5e7eb; }
+    .tools button:hover { background:#d1d5db; }
+    #search { flex:1; padding:8px 12px; border-radius:6px; border:1px solid #ccc; }
+    table { width:100%; border-collapse:collapse; margin-top:15px; border-radius:10px; overflow:hidden; }
+    th, td { padding:10px; border-bottom:1px solid #ddd; text-align:left; }
+    th { background:#f3f4f6; }
+    tr:hover { background:#f9fafc; }
+    .actions button { margin:2px; padding:5px 10px; font-size:12px; border:none; border-radius:4px; cursor:pointer; }
+    .editBtn { background:#2563eb; color:#fff; }
+    .deleteBtn { background:#dc2626; color:#fff; }
+    .dark { background:#111827; color:#eee; }
+    .dark main { background:#1f2937; }
+    .dark table th { background:#374151; color:#eee; }
+    .dark table td { color:#eee; }
+    #loginPage { display:flex; height:100vh; justify-content:center; align-items:center; background:#f3f4f6; }
+    #loginBox { background:white; padding:30px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.2); width:300px; text-align:center; }
+    #toast { visibility:hidden; min-width:250px; margin-left:-125px; background:#333; color:#fff; text-align:center; border-radius:6px; padding:12px; position:fixed; z-index:1; left:50%; bottom:30px; font-size:14px; }
+    #toast.show { visibility:visible; animation:fadein 0.5s, fadeout 0.5s 2.5s; }
     @keyframes fadein { from{bottom:0;opacity:0;} to{bottom:30px;opacity:1;} }
     @keyframes fadeout { from{bottom:30px;opacity:1;} to{bottom:0;opacity:0;} }
-    .dark { background:#121212; color:#eee; }
-    .dark main { background:#1e1e1e; color:#eee; }
-    .actions button { margin:2px; padding:5px 10px; }
   </style>
 </head>
 <body>
 
-  <!-- Login -->
-  <div id="loginPage">
-    <div id="loginBox">
-      <h2>Login SH Vision</h2>
-      <input type="text" id="loginUser" placeholder="Username">
-      <input type="password" id="loginPass" placeholder="Password">
-      <button onclick="login()">Login</button>
-      <p id="loginError" style="color:red; display:none;">Username / Password salah!</p>
-    </div>
+<!-- Login Page -->
+<div id="loginPage">
+  <div id="loginBox">
+    <img src="https://via.placeholder.com/200x60?text=SH+Vision" alt="Logo SH Vision">
+    <h2>Login</h2>
+    <input type="text" id="loginUser" placeholder="Username">
+    <input type="password" id="loginPass" placeholder="Password">
+    <button onclick="login()">Masuk</button>
+    <p id="loginError" style="color:red; display:none;">Login gagal!</p>
   </div>
+</div>
 
-  <!-- Aplikasi -->
-  <div id="appPage">
-    <header>
-      <img src="https://via.placeholder.com/150x50?text=SH+Vision" alt="SH Vision Logo"><br>
-      <h1>Data Pelanggan</h1>
-      <button onclick="toggleDarkMode()">🌙/☀️ Mode</button>
-    </header>
+<!-- App Page -->
+<div id="appPage" style="display:none;">
+  <header>
+    <img src="https://via.placeholder.com/200x60?text=SH+Vision" alt="Logo SH Vision">
+    <h1>Manajemen Data Pelanggan</h1>
+    <button onclick="toggleDarkMode()">🌙/☀️</button>
+  </header>
 
-    <main>
+  <main>
+    <h2>Tambah Pelanggan Baru</h2>
+    <form id="pelangganForm">
+      <input type="text" id="nama" placeholder="Nama Lengkap" required>
+      <input type="text" id="alamat" placeholder="Alamat" required>
+      <input type="text" id="telepon" placeholder="Nomor HP" required>
+      <input type="email" id="email" placeholder="Email">
+      <select id="paket" required>
+        <option value="">-- Pilih Paket --</option>
+        <option>Basic 20Mbps</option>
+        <option>Standard 50Mbps</option>
+        <option>Premium 100Mbps</option>
+      </select>
+      <input type="url" id="foto" placeholder="Link Foto Rumah">
+      <input type="url" id="map" placeholder="Link Google Maps">
+      <button type="submit">Simpan Data</button>
+    </form>
+
+    <div class="tools">
       <input type="text" id="search" placeholder="Cari pelanggan...">
-
-      <form id="pelangganForm">
-        <input type="text" id="nama" placeholder="Nama Lengkap" required>
-        <input type="text" id="alamat" placeholder="Alamat" required>
-        <input type="text" id="telepon" placeholder="Nomor HP" required>
-        <input type="email" id="email" placeholder="Email">
-        <select id="paket" required>
-          <option value="">-- Pilih Paket Internet --</option>
-          <option value="Basic 20Mbps">Basic 20Mbps</option>
-          <option value="Standard 50Mbps">Standard 50Mbps</option>
-          <option value="Premium 100Mbps">Premium 100Mbps</option>
-        </select>
-        <input type="url" id="foto" placeholder="Link Foto Rumah">
-        <input type="url" id="map" placeholder="Link Google Maps">
-        <button type="submit">Tambah Data</button>
-      </form>
-
       <button onclick="exportCSV()">Export CSV</button>
       <button onclick="exportExcel()">Export Excel</button>
       <input type="file" id="importExcel" accept=".xlsx">
+    </div>
 
-      <table id="tabelPelanggan">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Nama</th>
-            <th>Alamat</th>
-            <th>Nomor HP</th>
-            <th>Email</th>
-            <th>Paket</th>
-            <th>Foto Rumah</th>
-            <th>Maps</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </main>
-  </div>
+    <table id="tabelPelanggan">
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Nama</th>
+          <th>Alamat</th>
+          <th>Nomor HP</th>
+          <th>Email</th>
+          <th>Paket</th>
+          <th>Foto</th>
+          <th>Maps</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </main>
+</div>
 
-  <div id="toast" class="toast"></div>
+<div id="toast"></div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxU_A4AwZdZ6VLxEnpeOLRacibPaj6SCM4mkt9YOlTuVs0Kq00EQGYDzbHJK8KW28tq/exec"; // Ganti dengan URL Web App
-  let counter = 1;
-  let editingRow = null;
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjmRcaiz6AvwnCxewfqU9mXNpjlg7E8XZsxd67cBQ8Mr37paJZznmdRCdiLufwKh4vdQ/exec"; // ganti dengan URL Apps Script
+let editingRow = null;
+let counter = 1;
 
-  const form = document.getElementById("pelangganForm");
-  const tabelBody = document.querySelector("#tabelPelanggan tbody");
+// Login
+function login(){
+  const u=document.getElementById("loginUser").value;
+  const p=document.getElementById("loginPass").value;
+  if(u==="kenzonet" && p==="23456"){
+    localStorage.setItem("isLogin","true");
+    document.getElementById("loginPage").style.display="none";
+    document.getElementById("appPage").style.display="block";
+    loadData();
+  } else document.getElementById("loginError").style.display="block";
+}
+window.onload=()=>{ if(localStorage.getItem("isLogin")==="true"){ document.getElementById("loginPage").style.display="none"; document.getElementById("appPage").style.display="block"; loadData(); } };
 
-  // Login
-  function login() {
-    const user = document.getElementById("loginUser").value;
-    const pass = document.getElementById("loginPass").value;
-    if (user === "kenzonet" && pass === "23456") {
-      localStorage.setItem("isLogin","true");
-      document.getElementById("loginPage").style.display="none";
-      document.getElementById("appPage").style.display="block";
-      loadData();
-    } else document.getElementById("loginError").style.display="block";
+// Toast
+function showToast(msg){ const t=document.getElementById("toast"); t.innerText=msg; t.className="show"; setTimeout(()=>{t.className=t.className.replace("show","");},3000); }
+
+// Tambah data
+document.getElementById("pelangganForm").addEventListener("submit",function(e){
+  e.preventDefault();
+  const data={
+    nama:nama.value, alamat:alamat.value, telepon:telepon.value, email:email.value,
+    paket:paket.value, foto:foto.value, map:map.value
+  };
+  if(editingRow){ updateRow(editingRow,data); editingRow=null; showToast("Data diupdate"); }
+  else {
+    tambahRow(data);
+    fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify(data)});
+    showToast("Data tersimpan ke Google Sheets");
   }
-  window.onload = () => { if(localStorage.getItem("isLogin")==="true"){ document.getElementById("loginPage").style.display="none"; document.getElementById("appPage").style.display="block"; loadData(); } };
+  this.reset();
+});
 
-  // Tambah/Edit Data
-  form.addEventListener("submit", function(e){
-    e.preventDefault();
-    const data = {
-      nama: nama.value, alamat: alamat.value, telepon: telepon.value, email: email.value,
-      paket: paket.value, foto: foto.value, map: map.value
-    };
-    if(editingRow){ updateRow(editingRow,data); editingRow=null; showToast("Data berhasil diupdate"); }
-    else {
-      tambahRow(data);
-      fetch(SCRIPT_URL,{ method:"POST", body:JSON.stringify(data) })
-        .then(res=>res.text()).then(()=>showToast("Data berhasil disimpan ke Google Sheets"))
-        .catch(()=>showToast("Gagal simpan ke Google Sheets"));
-    }
-    form.reset();
+// Tabel
+function tambahRow(d){
+  const tbody=document.querySelector("#tabelPelanggan tbody");
+  const row=document.createElement("tr");
+  row.innerHTML=`<td>${counter++}</td>
+    <td>${d.nama}</td><td>${d.alamat}</td><td>${d.telepon}</td>
+    <td>${d.email}</td><td>${d.paket}</td>
+    <td><a href="${d.foto}" target="_blank">Foto</a></td>
+    <td><a href="${d.map}" target="_blank">Map</a></td>
+    <td class="actions">
+      <button class="editBtn" onclick="editRow(this)">Edit</button>
+      <button class="deleteBtn" onclick="deleteRow(this)">Hapus</button>
+    </td>`;
+  tbody.appendChild(row);
+}
+function updateRow(row,d){
+  row.cells[1].innerText=d.nama; row.cells[2].innerText=d.alamat; row.cells[3].innerText=d.telepon;
+  row.cells[4].innerText=d.email; row.cells[5].innerText=d.paket;
+  row.cells[6].innerHTML=`<a href="${d.foto}" target="_blank">Foto</a>`;
+  row.cells[7].innerHTML=`<a href="${d.map}" target="_blank">Map</a>`;
+}
+function editRow(btn){ editingRow=btn.closest("tr");
+  nama.value=editingRow.cells[1].innerText; alamat.value=editingRow.cells[2].innerText;
+  telepon.value=editingRow.cells[3].innerText; email.value=editingRow.cells[4].innerText;
+  paket.value=editingRow.cells[5].innerText;
+}
+function deleteRow(btn){ btn.closest("tr").remove(); showToast("Data dihapus"); }
+
+// Load dari Sheets
+function loadData(){
+  fetch(SCRIPT_URL).then(r=>r.json()).then(rows=>{
+    document.querySelector("#tabelPelanggan tbody").innerHTML=""; counter=1;
+    rows.forEach(d=>tambahRow(d));
   });
+}
 
-  function tambahRow(data){
-    const row=document.createElement("tr");
-    row.innerHTML=`<td>${counter++}</td>
-      <td>${data.nama}</td><td>${data.alamat}</td><td>${data.telepon}</td>
-      <td>${data.email}</td><td>${data.paket}</td>
-      <td><a href="${data.foto}" target="_blank">Foto</a></td>
-      <td><a href="${data.map}" target="_blank">Map</a></td>
-      <td class="actions">
-        <button onclick="editRow(this)">Edit</button>
-        <button onclick="deleteRow(this)">Hapus</button>
-      </td>`;
-    tabelBody.appendChild(row);
-  }
-  function updateRow(row,data){
-    row.cells[1].innerText=data.nama;
-    row.cells[2].innerText=data.alamat;
-    row.cells[3].innerText=data.telepon;
-    row.cells[4].innerText=data.email;
-    row.cells[5].innerText=data.paket;
-    row.cells[6].innerHTML=`<a href="${data.foto}" target="_blank">Foto</a>`;
-    row.cells[7].innerHTML=`<a href="${data.map}" target="_blank">Map</a>`;
-  }
-  function editRow(btn){
-    editingRow=btn.parentElement.parentElement;
-    nama.value=editingRow.cells[1].innerText;
-    alamat.value=editingRow.cells[2].innerText;
-    telepon.value=editingRow.cells[3].innerText;
-    email.value=editingRow.cells[4].innerText;
-    paket.value=editingRow.cells[5].innerText;
-  }
-  function deleteRow(btn){
-    btn.parentElement.parentElement.remove(); showToast("Data dihapus");
-  }
-
-  // Load dari Google Sheets
-  function loadData(){
-    fetch(SCRIPT_URL).then(res=>res.json()).then(rows=>{
-      tabelBody.innerHTML=""; counter=1;
-      rows.forEach(d=>tambahRow(d));
-    }).catch(()=>showToast("Gagal load data"));
-  }
-
-  // Export CSV
-  function exportCSV(){
-    let csv="No,Nama,Alamat,Telepon,Email,Paket,Foto,Map\\n";
-    document.querySelectorAll("#tabelPelanggan tbody tr").forEach(r=>{
-      let cols=[...r.children].slice(1,8).map(td=>td.innerText); csv+=cols.join(",")+"\\n";
-    });
-    const blob=new Blob([csv],{type:"text/csv"}); const a=document.createElement("a");
-    a.href=URL.createObjectURL(blob); a.download="pelanggan.csv"; a.click();
-  }
-
-  // Export Excel
-  function exportExcel(){
-    const wb=XLSX.utils.book_new();
-    const ws_data=[["No","Nama","Alamat","Telepon","Email","Paket","Foto","Map"]];
-    document.querySelectorAll("#tabelPelanggan tbody tr").forEach(r=>{
-      ws_data.push([...[...r.children].slice(0,8)].map(td=>td.innerText));
-    });
-    const ws=XLSX.utils.aoa_to_sheet(ws_data); XLSX.utils.book_append_sheet(wb,ws,"Pelanggan");
-    XLSX.writeFile(wb,"pelanggan.xlsx");
-  }
-
-  // Import Excel
-  document.getElementById("importExcel").addEventListener("change",function(e){
-    const file=e.target.files[0]; const reader=new FileReader();
-    reader.onload=(evt)=>{
-      const data=new Uint8Array(evt.target.result); const workbook=XLSX.read(data,{type:"array"});
-      const sheet=XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-      sheet.forEach(row=>{ tambahRow(row); fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify(row)}); });
-      showToast("Data berhasil diimport");
-    };
-    reader.readAsArrayBuffer(file);
+// Search
+document.getElementById("search").addEventListener("input",function(){
+  const q=this.value.toLowerCase();
+  document.querySelectorAll("#tabelPelanggan tbody tr").forEach(r=>{
+    r.style.display=[...r.children].some(td=>td.innerText.toLowerCase().includes(q))?"":"none";
   });
+});
 
-  // Search filter
-  document.getElementById("search").addEventListener("input",function(){
-    const q=this.value.toLowerCase();
-    document.querySelectorAll("#tabelPelanggan tbody tr").forEach(r=>{
-      r.style.display=[...r.children].some(td=>td.innerText.toLowerCase().includes(q))?"":"none";
-    });
+// Export CSV
+function exportCSV(){
+  let csv="No,Nama,Alamat,Telepon,Email,Paket,Foto,Map\n";
+  document.querySelectorAll("#tabelPelanggan tbody tr").forEach(r=>{
+    let cols=[...r.children].slice(1,8).map(td=>td.innerText); csv+=cols.join(",")+"\n";
   });
+  const blob=new Blob([csv],{type:"text/csv"}); const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download="pelanggan.csv"; a.click();
+}
 
-  // Dark Mode
-  function toggleDarkMode(){ document.body.classList.toggle("dark"); }
+// Export Excel
+function exportExcel(){
+  const wb=XLSX.utils.book_new();
+  const ws_data=[["No","Nama","Alamat","Telepon","Email","Paket","Foto","Map"]];
+  document.querySelectorAll("#tabelPelanggan tbody tr").forEach(r=>{
+    ws_data.push([...[...r.children].slice(0,8)].map(td=>td.innerText));
+  });
+  const ws=XLSX.utils.aoa_to_sheet(ws_data); XLSX.utils.book_append_sheet(wb,ws,"Pelanggan");
+  XLSX.writeFile(wb,"pelanggan.xlsx");
+}
 
-  // Toast
-  function showToast(msg){
-    const t=document.getElementById("toast"); t.innerText=msg; t.className="toast show";
-    setTimeout(()=>{t.className=t.className.replace("show","");},3000);
-  }
+// Import Excel
+document.getElementById("importExcel").addEventListener("change",function(e){
+  const file=e.target.files[0]; const reader=new FileReader();
+  reader.onload=(evt)=>{
+    const wb=XLSX.read(new Uint8Array(evt.target.result),{type:"array"});
+    const sheet=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+    sheet.forEach(row=>{ tambahRow(row); fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify(row)}); });
+    showToast("Import selesai");
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+// Dark mode
+function toggleDarkMode(){ document.body.classList.toggle("dark"); }
 </script>
 </body>
 </html>
